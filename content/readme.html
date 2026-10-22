@@ -1,0 +1,44 @@
+<h1>ReadMe</h1>
+<p class="lead">A 40-item self-assessment that shows how ready a country is to adopt AI at national scale, using India's digital public infrastructure (DPI) journey as the reference case.</p>
+
+<h2>What this tool is</h2>
+<p>It supports the session <em>"Preparing a country for AI scale"</em>. The session explores DPI, trusted data ecosystems, identity and consent frameworks, compute, talent, regulatory readiness and public-private collaboration. Each participant scores their country before the session. The scores are then compared with a reference baseline (this build: <b>{{COUNTRY}}</b>) and pooled across the group.</p>
+
+<h2>The eight pillars</h2>
+<p>P1–P3 are the rails India built for DPI. P4–P6 are what AI adds on top. P7–P8 decide whether the whole system is trusted and used. Each pillar has five questions.</p>
+<div data-slot="pillar-table"></div>
+
+<h2>Anchored responses</h2>
+<p>Each question has written descriptions for scores 1, 3 and 5, and 2 and 4 sit between them. This way, two respondents who choose a 3 mean the same thing. <b>DK</b> (don't know) is allowed and is not scored. If a pillar has two or more DK answers, it is reported as having insufficient evidence.</p>
+
+<h2>How the {{COUNTRY}} baseline was assumed (suggestive)</h2>
+<p class="callout ind" data-slot="baseline-status"></p>
+<ol>
+  <li><b>Evidence scan.</b> Public material on each pillar, as of <span data-slot="asof"></span>. For India, this is the material in the pre-reads (see References).</li>
+  <li><b>Same anchors as respondents.</b> Each item is scored 1–5 against the same written descriptions respondents use.</li>
+  <li><b>Factored pillar scores.</b> A pillar's baseline is the mean of its five item scores, computed at build time, so the two can never disagree.</li>
+  <li><b>Scoring rules:</b> score what operates at national scale today, not what has been announced; score the national picture, not the best state or sector; where a law exists but its obligations are not yet in force, score at most 3.</li>
+  <li><b>Range.</b> Each pillar has a plausible low–high range that shows how far a well-informed reviewer could reasonably move the score.</li>
+</ol>
+<h3 style="margin-top:16px">Evidence and assumptions by pillar</h3>
+<div data-slot="baseline-evidence"></div>
+<h3 style="margin-top:16px">Baselines in this project</h3>
+<p class="small muted">Each baseline is a file in <code>config/baselines/</code>. The same questions are compared against whichever country you choose at build time.</p>
+<div data-slot="baselines-list"></div>
+<p class="callout ind"><b>Baselines are suggestive, not definitive.</b> They are expert judgements, not survey results or official positions, and they go out of date as policies and infrastructure change. Use them as reference points to argue with, not verdicts. Facilitators can adjust them for each assessment, for example by updating the evidence, using an expert panel's median scores, narrowing the scope to a state or sector, or setting target scores instead of a peer country. Each baseline is a file in <code>config/baselines/</code>, and the project README explains how to change it.</p>
+
+<h2>How scores are computed</h2>
+<ul>
+  <li><b>Pillar score</b> = mean of non-DK items (blank if two or more items are DK).</li>
+  <li><b>Overall score</b> = mean of the eight pillar scores.</li>
+  <li><b>Gap</b> = your score − {{COUNTRY}} baseline.</li>
+  <li><b>Group score</b> = median across respondents. <b>Spread</b> = interquartile range (Q3 − Q1). A spread above 1.0 marks a pillar where respondents disagree.</li>
+</ul>
+<div data-slot="bands-table"></div>
+
+<h2>Your data</h2>
+<p>Everything runs in your browser. Answers are saved only in this browser's local storage, and nothing is sent to any server. To share results, export a JSON or CSV file from the Results tab. To clear your answers, use <b>Reset my answers</b> on the Start tab.</p>
+
+<h2>Customising and contributing</h2>
+<p>Questions, baseline scores, references and author details all live in JSON config files. Edit them and rebuild to make your own version. The source is in the project repository.</p>
+<div data-slot="repo"></div>
