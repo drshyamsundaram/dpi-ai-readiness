@@ -1,0 +1,130 @@
+{
+  "id": "common",
+  "version": "1.0.0",
+  "asOf": "22 October 2026",
+  "title": "Global and comparative",
+  "description": "Cross-country frameworks, indices and comparator regimes used in every build.",
+  "preReads": [
+    {
+      "id": "universal-dpi-safeguards-framework",
+      "title": "Universal DPI Safeguards Framework",
+      "links": [
+        {
+          "label": "Framework",
+          "url": "https://www.dpi-safeguards.org/framework"
+        }
+      ],
+      "source": "UN / UNDP, 2024",
+      "pillars": [
+        "P8"
+      ],
+      "why": "Rights, inclusion and the risks of DPI at scale"
+    },
+    {
+      "id": "ai-index-report-2026-india-sections",
+      "title": "AI Index Report 2026 (India sections)",
+      "links": [
+        {
+          "label": "Stanford HAI",
+          "url": "https://hai.stanford.edu/ai-index/2026-ai-index-report"
+        }
+      ],
+      "source": "Stanford HAI, 2026",
+      "pillars": [
+        "P5"
+      ],
+      "why": "Benchmarks for AI talent and skills"
+    },
+    {
+      "id": "dpi-wiki-and-implementation-guidance",
+      "title": "DPI Wiki and implementation guidance",
+      "links": [
+        {
+          "label": "DPI Wiki",
+          "url": "https://docs.cdpi.dev/the-dpi-wiki/dpi-overview"
+        },
+        {
+          "label": "Guidance",
+          "url": "https://docs.cdpi.dev/the-dpi-wiki/dpi-implementation-and-execution-guidance"
+        }
+      ],
+      "source": "CDPI",
+      "pillars": [
+        "P7"
+      ],
+      "why": "How to replicate DPI in other countries"
+    },
+    {
+      "id": "ai-preparedness-index-government-ai-readiness-in",
+      "title": "AI Preparedness Index; Government AI Readiness Index 2025",
+      "links": [
+        {
+          "label": "IMF",
+          "url": "https://www.imf.org/external/datamapper/map/AI_PI@AIPI"
+        },
+        {
+          "label": "Oxford Insights",
+          "url": "https://oxfordinsights.com/ai-readiness/government-ai-readiness-index-2025/"
+        }
+      ],
+      "source": "IMF 2024; Oxford Insights 2025",
+      "pillars": [
+        "All"
+      ],
+      "why": "Frameworks for comparing countries"
+    },
+    {
+      "id": "readiness-assessment-methodology-ram",
+      "title": "Readiness Assessment Methodology (RAM)",
+      "links": [
+        {
+          "label": "UNESCO",
+          "url": "https://www.unesco.org/ethics-ai/en/ram?hub=32618"
+        }
+      ],
+      "source": "UNESCO",
+      "pillars": [
+        "All"
+      ],
+      "why": "A structured diagnostic for national AI readiness"
+    },
+    {
+      "id": "eu-ai-act-high-level-summary-uk-ai-opportunities",
+      "title": "EU AI Act high-level summary; UK AI Opportunities Action Plan",
+      "links": [
+        {
+          "label": "EU AI Act",
+          "url": "https://artificialintelligenceact.eu/high-level-summary/"
+        },
+        {
+          "label": "UK plan",
+          "url": "https://www.gov.uk/government/publications/ai-opportunities-action-plan/ai-opportunities-action-plan"
+        }
+      ],
+      "source": "EU 2024; UK 2025",
+      "pillars": [
+        "P6"
+      ],
+      "why": "Contrasting models to set India's against"
+    },
+    {
+      "id": "oecd-ai-principles",
+      "title": "OECD AI Principles (updated 2024)",
+      "links": [
+        {
+          "label": "OECD",
+          "url": "https://www.oecd.org/en/topics/sub-issues/ai-principles.html"
+        },
+        {
+          "label": "OECD.AI",
+          "url": "https://oecd.ai/en/dashboards/policy-initiatives/oecd-ai-principles-9705"
+        }
+      ],
+      "source": "OECD, 2019; updated 2024",
+      "pillars": [
+        "P6"
+      ],
+      "why": "The intergovernmental baseline for trustworthy AI"
+    }
+  ]
+}

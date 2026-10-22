@@ -1,5 +1,7 @@
 {
   "id": "us",
+  "version": "1.0.0",
+  "references": "us",
   "aliases": ["usa", "u.s.", "united states of america", "america"],
   "name": "United States",
   "short": "US",

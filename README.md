@@ -21,9 +21,9 @@ Built for the session **"Preparing a country for AI scale"**, which explores dig
 | **Group** | Drop in many JSON exports to see median, IQR spread, gap to India, contested pillars; export group CSV |
 | **ReadMe** | Method, baseline assumptions, scoring rules, data handling |
 | **Instructions** | Step-by-step guidance for respondents and facilitators |
-| **References** | All 35 pre-reads plus annexures, with search, pillar filter and a core-set filter (from `config/references.json`) |
+| **References** | The build country's own pre-reads, India's core DPI pre-reads, global sources and annexures, grouped by set, with search and filters by set, pillar and core set (from `config/references/`) |
 | **License** | MIT license text (read from `LICENSE` at build time) |
-| **About** | Author, LinkedIn and GitHub links, project metadata |
+| **About** | Author, LinkedIn and GitHub links, project metadata, and the configuration versions used for this build |
 
 The page also has light and dark themes, a layout that works on phones, autosave to the browser's local storage, and print styles.
 
@@ -60,7 +60,7 @@ Change the baseline to fit the purpose, audience and evidence you have. For exam
 ## Quick start
 
 ```bash
-git clone https://github.com/REPLACE-WITH-YOUR-USERNAME/ai-readiness-assessment.git
+git clone https://github.com/drshyamsundaram/ai-readiness-assessment.git
 cd ai-readiness-assessment
 npm run build                      # default country (site.json "defaultCountry") -> dist/india/index.html
 npm run build -- --country us      # -> dist/us/index.html
@@ -89,9 +89,13 @@ You can also set the country with an environment variable: `COUNTRY=china npm ru
 ai-readiness-assessment/
 ├── config/
 │   ├── site.json          # title, version, author + links, license, readiness bands
-│   ├── pillars.json       # 8 pillars × 5 items: questions and anchors only (no scores)
-│   ├── references.json    # pre-reads and annexures shown on the References tab
-│   └── baselines/         # one file per country: item scores, ranges, evidence
+│   ├── pillars.json       # versioned question set: 8 pillars × 5 items, anchors only (no scores)
+│   ├── baselines/         # one versioned file per country: item scores, ranges, evidence
+│   └── references/        # one versioned reference set per country, plus shared sets
+│       ├── common.json    # global and comparative sources, included by every country
+│       ├── india.json
+│       ├── us.json
+│       └── china.json
 │       ├── india.json
 │       ├── us.json
 │       └── china.json
@@ -108,10 +112,12 @@ ai-readiness-assessment/
 │   └── lib/
 │       ├── config.js      # file + JSON loading with line-pointing errors
 │       ├── baseline.js    # list, resolve, load and apply (factor) baselines
-│       ├── validate.js    # site, question and reference checks
+│       ├── validate.js    # site and question checks
+│       ├── references.js  # resolve a country's reference set and its includes
+│       ├── manifest.js    # version checks and the build manifest
 │       └── render.js      # page assembly, country tokens, chooser page
 ├── .github/workflows/build.yml   # CI: validate, build, publish to GitHub Pages
-├── dist/                  # build output (git-ignored)
+├── dist/                  # build output (git-ignored): <id>/index.html + <id>/manifest.json
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -183,25 +189,45 @@ This file holds questions only. Scores live in the baselines.
 
 > All three baselines are **suggestive**. India's comes from the evidence in the pre-reads; the United States and China baselines are **illustrative drafts** from general public knowledge. Review and change them to fit your assessment before using them in a session; see [Country baselines are suggestive](#country-baselines-are-suggestive).
 
-### `config/references.json`
+### `config/references/<id>.json`: country reference sets
+
+Each country build shows its **own** References tab. The baseline file names its reference set with `"references": "<id>"`; if it doesn't, the build uses the set with the same id.
 
 ```json
 {
+  "id": "us",
+  "version": "1.0.0",
   "asOf": "22 October 2026",
+  "title": "United States: AI policy, compute and digital rails",
+  "description": "...",
+  "include": ["india#core", "india#annexures", "common"],
+  "includeTitles": { "india#core": "India's DPI journey (session core)" },
   "preReads": [
-    { "n": 7, "star": true, "title": "...", "links": [{ "label": "PDF", "url": "https://..." }],
-      "source": "NITI Aayog, 2020", "pillars": ["P2", "P3"], "why": "..." }
+    { "id": "us-nist-ai-rmf", "star": true, "title": "...", "links": [{ "label": "PDF", "url": "https://..." }],
+      "source": "NIST, 2023", "pillars": ["P6"], "why": "..." }
   ],
-  "annexures": [
-    { "id": "A", "title": "Latest DEPA references (iSPIRT blog)", "intro": "...",
-      "items": [{ "date": "5 May 2026", "title": "...", "url": "https://...", "adds": "...",
-                  "code": { "label": "depa-inferencing", "url": "https://github.com/..." } }],
-      "more": [{ "label": "...", "url": "https://..." }] }
-  ]
+  "annexures": [ { "title": "...", "intro": "...", "items": [ { "date": "...", "title": "...", "url": "https://...", "adds": "..." } ] } ]
 }
 ```
 
-To add a new annexure (for example, Annexure B), add another object to `annexures`.
+| `include` entry | Adds |
+| --- | --- |
+| `"common"` | Every pre-read and annexure in `common.json` |
+| `"india#core"` | Only India's starred (core) pre-reads |
+| `"india#annexures"` | Only India's annexures (e.g. the DEPA references) |
+
+What each build contains:
+
+| Build | Sections on the References tab | Pre-reads | Annexures |
+| --- | --- | --- | --- |
+| India | India · Global and comparative | 36 | A: DEPA references |
+| United States | United States · India's DPI journey (core) · Global and comparative | 27 | A: DEPA references |
+| China | China · India's DPI journey (core) · Global and comparative | 26 | A: DEPA references |
+
+- Pre-reads are numbered 1..N in page order, and annexures are lettered A, B, C... in each build, so numbers stay continuous whatever is included.
+- Give each pre-read a stable `id`. A pre-read that appears in two included sets is shown once.
+- The tab has search, a filter by set and pillar, and a "core set only" filter.
+- The US and China sets link to official releases or established English translations (DigiChina at Stanford, China Law Translate). The links were located on the `asOf` date; check them before circulating.
 
 ## Method
 
@@ -211,6 +237,27 @@ To add a new annexure (for example, Annexure B), add another object to `annexure
 - **Bands:** Foundational < 2.0 ≤ Emerging < 3.0 ≤ Scaling < 4.0 ≤ AI-ready.
 
 Baselines are suggestive expert judgements made against the same anchors respondents use, as of each file's `asOf` date. They are not survey results, and they are meant to be modified for each assessment. Each page's ReadMe tab shows the evidence, assumptions and confidence for every pillar.
+
+## Configuration versions
+
+Every configuration file carries its own `version`, and every build records which versions it used.
+
+| File | Version field | Bump it when |
+| --- | --- | --- |
+| `config/site.json` | `version` (app) | The app, layout or behaviour changes |
+| `config/pillars.json` | `version` (questions) | Any question or anchor changes |
+| `config/baselines/<id>.json` | `version` | Any score, range or evidence line changes |
+| `config/references/<id>.json` | `version` | Any reference is added, removed or relinked |
+
+Versions use `MAJOR.MINOR.PATCH`; the build warns if one is missing or in another form.
+
+**What the build does with them:**
+
+- Writes `dist/<id>/manifest.json` next to each page, plus `dist/manifest.json` for `--all`. Each lists the app, questions, baseline and every included reference set by version and file, with the build date and a 12-character **fingerprint** of all inputs. The fingerprint changes whenever any input changes.
+- Prints the versions for each country (`npm run build:all`, `npm run list`, `npm run check`).
+- Embeds the manifest in the page. The **About** tab shows a "Configuration versions" table, and the footer shows the baseline version, question version and fingerprint.
+- Adds the versions to every **JSON export**. The **Group** tab warns when a response was answered on a different question version, or exported from another country build.
+- Keys saved answers by country and question version (`<storageKey>-<country>-q<questions version>`). Bumping the question version therefore starts respondents with a clean form instead of mapping old answers onto new questions.
 
 ## Deploying
 
@@ -226,4 +273,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE) © 2026 Dr Shyam Sundaram
+[MIT](LICENSE)

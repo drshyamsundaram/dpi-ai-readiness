@@ -1,5 +1,7 @@
 {
   "id": "china",
+  "version": "1.0.0",
+  "references": "china",
   "aliases": ["prc", "people's republic of china"],
   "name": "China",
   "inSentence": "China",

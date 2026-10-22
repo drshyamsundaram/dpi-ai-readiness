@@ -1,5 +1,7 @@
 {
   "id": "india",
+  "version": "1.0.0",
+  "references": "india",
   "aliases": ["bharat", "in"],
   "name": "India",
   "inSentence": "India",

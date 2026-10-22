@@ -14,6 +14,6 @@ let timer;
 const schedule = () => { clearTimeout(timer); timer = setTimeout(build, 150); };
 
 build();
-['config', 'config/baselines', 'content', 'src'].forEach((d) => fs.watch(path.join(ROOT, d), schedule));
+['config', 'config/baselines', 'config/references', 'content', 'src'].forEach((d) => fs.watch(path.join(ROOT, d), schedule));
 fs.watch(path.join(ROOT, 'LICENSE'), schedule);
 console.log('Watching config/, content/, src/ and LICENSE ... (Ctrl+C to stop)');

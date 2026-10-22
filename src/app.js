@@ -158,7 +158,7 @@ function renderResults(){
     '<li><b>First move:</b> name one action, an owner and a 12-month marker for '+(low?low.p.id:'your weakest pillar')+'.</li></ol></div>';
   $('#resBody').innerHTML = h;
 }
-function responseObj(){ return {schema:'ai-readiness-v1',exported:new Date().toISOString(),baseline:BL.id,profile:state.profile,answers:state.answers,evidence:state.evidence}; }
+function responseObj(){ return {schema:'ai-readiness-v1',exported:new Date().toISOString(),baseline:BL.id,versions:{app:(MF.app||{}).version,questions:(MF.questions||{}).version,baseline:(MF.baseline||{}).version,references:MF.references||[],fingerprint:MF.fingerprint},profile:state.profile,answers:state.answers,evidence:state.evidence}; }
 function download(name, text, type){ var b=new Blob([text],{type:type}); var u=URL.createObjectURL(b); var a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(u); a.remove();},100); }
 function slug(s){ return String(s||'response').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'response'; }
 function csvCell(v){ v = v==null?'':String(v); return /[",\n]/.test(v)? '"'+v.replace(/"/g,'""')+'"' : v; }
@@ -172,7 +172,9 @@ function quantile(sorted,q){ if(!sorted.length) return null; var pos=(sorted.len
 function addResp(o, label){
   if(!o||!o.answers){ toast('Not a valid response file'); return false; }
   var nm = (o.profile&&(o.profile.name||o.profile.org)) || label || ('Respondent '+(state.group.length+1));
-  state.group.push({name:nm, profile:o.profile||{}, answers:o.answers, evidence:o.evidence||{}}); save(); return true;
+  var qv=(o.versions||{}).questions||''; var cur=(MF.questions||{}).version||'';
+  if(qv && cur && qv!==cur) toast(nm+': answered on questions v'+qv+' (this page: v'+cur+')');
+  state.group.push({name:nm, profile:o.profile||{}, answers:o.answers, evidence:o.evidence||{}, baseline:o.baseline||'', qv:qv}); save(); return true;
 }
 function handleFiles(files){ var arr=Array.prototype.slice.call(files), done=0, ok=0;
   arr.forEach(function(f){ var rd=new FileReader(); rd.onload=function(){ try{ if(addResp(JSON.parse(rd.result), f.name.replace(/\.json$/,''))) ok++; }catch(e){ toast('Could not read '+f.name); } if(++done===arr.length){ renderGroup(); toast(ok+' response'+(ok===1?'':'s')+' added'); } }; rd.readAsText(f); }); }
@@ -202,6 +204,11 @@ function renderGroup(){
     '<div class="card tile"><div class="lab">Group overall</div><div class="val">'+fmt(overall)+'</div><div class="sub">'+(b?b[2]:'')+' · '+BN+' '+fmt(baseOverall)+'</div></div>'+
     '<div class="card tile"><div class="lab">Binding constraint</div><div class="val" style="font-size:24px">'+(low?low.p.id+' · '+fmt(low.med):'–')+'</div><div class="sub">'+(low?esc(low.p.name):'')+'</div></div>'+
     '<div class="card tile"><div class="lab">Contested pillars</div><div class="val">'+contested.length+'</div><div class="sub">Spread (IQR) above 1.0</div></div></div>';
+  var curQ=(MF.questions||{}).version||'';
+  var mismatch = G.filter(function(g){ return g.qv && curQ && g.qv!==curQ; });
+  var otherBase = G.filter(function(g){ return g.baseline && g.baseline!==BL.id; });
+  if(mismatch.length) h += '<div class="callout ind" style="margin-top:16px"><b>Question versions differ.</b> '+mismatch.map(function(g){return esc(g.name)+' (v'+esc(g.qv)+')';}).join(', ')+' answered a different question set from this page (v'+esc(curQ)+'). Compare their scores with care.</div>';
+  if(otherBase.length) h += '<div class="callout" style="margin-top:16px">'+otherBase.length+' response'+(otherBase.length===1?' was':'s were')+' exported from another country build. Scores are compared here against the <b>'+esc(BL.name)+'</b> baseline.</div>';
   if(contested.length) h += '<div class="callout ind" style="margin-top:16px"><b>Resolve the facts first.</b> Respondents disagree on '+contested.map(function(r){return r.p.id;}).join(', ')+'. Compare their evidence before you debate priorities.</div>';
   h += '<div class="rescols"><div class="card pad"><h2>Group median against '+BR+'</h2><div class="legend" style="margin:6px 0 4px"><span><i style="background:var(--accent)"></i>Group median</span><span><i style="background:var(--india)"></i>'+BN+' baseline</span></div>'+
     radar([{label:''+BN+' baseline',values:P.map(function(p){return p.base;}),color:'var(--india)',fill:0.06,dash:true},{label:'Group median',values:st.map(function(r){return r.med;}),color:'var(--accent)',fill:0.16}],{label:'Group median pillar scores against the '+BN+' baseline'})+'</div>'+
@@ -236,7 +243,7 @@ function renderChrome(){
   document.title = (SITE.title||document.title)+' · '+BN+' baseline';
   $('#brandTitle').textContent = SITE.title||'';
   $('#brandSub').textContent = SITE.subtitle||'';
-  $('#footText').textContent = 'v'+(SITE.version||'')+' · '+(SITE.license?SITE.license.name+' License · ':'')+'Created by '+((SITE.author||{}).name||'')+' · '+BL.name+' baseline: '+(BL.status||'')+' (as of '+(BL.asOf||'')+').';
+  $('#footText').textContent = 'v'+(SITE.version||'')+' · '+(SITE.license?SITE.license.name+' License · ':'')+'Created by '+((SITE.author||{}).name||'')+' · '+BL.name+' baseline v'+((MF.baseline||{}).version||'')+': '+(BL.status||'')+' (as of '+(BL.asOf||'')+') · questions v'+((MF.questions||{}).version||'')+' · build '+(MF.fingerprint||'')+'.';
 }
 
 /* readme + instructions slots */
@@ -256,30 +263,48 @@ function renderDocs(){
 }
 
 /* references */
-var refFilter = {q:'',pillar:'',core:false};
+var refFilter = {q:'',pillar:'',core:false,section:''};
+var MF = C.manifest || {};
 function renderRefs(){
   var el = $('#refBody'); if(!el) return;
   if(!el.dataset.ready){
-    el.innerHTML = '<h1>References</h1><p class="lead">The pre-reads mapped to each pillar, plus the annexures. Starred items are the core set (about six hours). Links located as of '+esc(REFS.asOf||'')+'.</p>'+
-      '<div class="reftools noprint"><input id="refQ" type="search" placeholder="Search titles, sources and notes" aria-label="Search references"><select id="refP" aria-label="Filter by pillar"><option value="">All pillars</option>'+P.map(function(p){return '<option value="'+p.id+'">'+p.id+' '+esc(p.name)+'</option>';}).join('')+'</select><label class="toggle"><input type="checkbox" id="refCore"> Core set only</label></div>'+
-      '<div id="refCount" class="tiny" style="margin-bottom:8px"></div><div class="reflist" id="refList"></div><div id="annexBody"></div>'+
+    var secs = REFS.sections||[];
+    el.innerHTML = '<h1>References</h1><p class="lead">Pre-reads for the '+esc(BL.name)+' build, grouped by source set and mapped to each pillar, plus the annexures. Starred items are the core set. Links located as of '+esc(REFS.asOf||'')+'.</p>'+
+      '<div class="row small muted" style="margin:-10px 0 16px">'+(REFS.versions||[]).map(function(v){ return '<span class="pillchip">'+esc(v.id)+' v'+esc(v.version||'?')+'</span>'; }).join('')+'</div>'+
+      '<div class="reftools noprint"><input id="refQ" type="search" placeholder="Search titles, sources and notes" aria-label="Search references">'+
+      (secs.length>1?'<select id="refS" aria-label="Filter by set"><option value="">All sets</option>'+secs.map(function(x){return '<option value="'+esc(x.id)+'">'+esc(x.title)+'</option>';}).join('')+'</select>':'')+
+      '<select id="refP" aria-label="Filter by pillar"><option value="">All pillars</option>'+P.map(function(p){return '<option value="'+p.id+'">'+p.id+' '+esc(p.name)+'</option>';}).join('')+'</select><label class="toggle"><input type="checkbox" id="refCore"> Core set only</label></div>'+
+      '<div id="refCount" class="tiny" style="margin-bottom:8px"></div><div id="refList"></div><div id="annexBody"></div>'+
       (REFS.note?'<p class="tiny" style="margin-top:18px">'+esc(REFS.note)+'</p>':'');
     el.dataset.ready='1';
     $('#refQ').addEventListener('input',function(e){ refFilter.q=e.target.value.toLowerCase(); drawRefs(); });
     $('#refP').addEventListener('change',function(e){ refFilter.pillar=e.target.value; drawRefs(); });
+    if($('#refS')) $('#refS').addEventListener('change',function(e){ refFilter.section=e.target.value; drawRefs(); });
     $('#refCore').addEventListener('change',function(e){ refFilter.core=e.target.checked; drawRefs(); });
     drawAnnex();
   }
   drawRefs();
 }
+function refMatch(r){
+  if(refFilter.core && !r.star) return false;
+  if(refFilter.section && r.section!==refFilter.section) return false;
+  var ps = r.pillars||[];
+  if(refFilter.pillar && ps.indexOf(refFilter.pillar)<0 && ps.indexOf('All')<0) return false;
+  if(refFilter.q && (r.title+' '+(r.source||'')+' '+(r.why||'')).toLowerCase().indexOf(refFilter.q)<0) return false;
+  return true;
+}
+function refCard(r){
+  return '<div class="card ref"><div class="rn'+(r.star?' star':'')+'" title="'+(r.star?'Core pre-read':'')+'">'+(r.star?'★':'')+r.n+'</div><div><h3>'+esc(r.title)+'</h3><div class="why">'+esc(r.why||'')+'</div><div class="meta"><span class="pillchip">'+esc(r.source||'')+'</span>'+(r.pillars||[]).map(function(p){return '<span class="pillchip you">'+esc(p)+'</span>';}).join('')+'</div></div><div class="links">'+(r.links||[]).map(function(l){return extLink(l.url,l.label,'link');}).join('')+'</div></div>';
+}
 function drawRefs(){
-  var list = (REFS.preReads||[]).filter(function(r){
-    if(refFilter.core && !r.star) return false;
-    if(refFilter.pillar && r.pillars.indexOf(refFilter.pillar)<0 && r.pillars.indexOf('All')<0) return false;
-    if(refFilter.q && (r.title+' '+r.source+' '+r.why).toLowerCase().indexOf(refFilter.q)<0) return false;
-    return true; });
-  $('#refCount').textContent = list.length+' of '+(REFS.preReads||[]).length+' pre-reads';
-  $('#refList').innerHTML = list.length ? list.map(function(r){ return '<div class="card ref"><div class="rn'+(r.star?' star':'')+'" title="'+(r.star?'Core pre-read':'')+'">'+(r.star?'★':'')+r.n+'</div><div><h3>'+esc(r.title)+'</h3><div class="why">'+esc(r.why)+'</div><div class="meta"><span class="pillchip">'+esc(r.source)+'</span>'+r.pillars.map(function(p){return '<span class="pillchip you">'+esc(p)+'</span>';}).join('')+'</div></div><div class="links">'+(r.links||[]).map(function(l){return extLink(l.url,l.label,'link');}).join('')+'</div></div>'; }).join('') : '<div class="card empty">No references match.</div>';
+  var total = (REFS.preReads||[]).length, shown = 0;
+  var html = (REFS.sections||[]).map(function(sec){
+    var items = sec.items.filter(refMatch); shown += items.length;
+    if(!items.length) return '';
+    return '<div class="refsec"><div class="refsec-h"><h2>'+esc(sec.title)+'</h2><span class="pillchip">v'+esc(sec.version||'?')+' · '+items.length+(items.length===sec.items.length?'':' of '+sec.items.length)+'</span></div>'+(sec.description?'<p class="small muted" style="margin:0 0 10px">'+esc(sec.description)+'</p>':'')+'<div class="reflist">'+items.map(refCard).join('')+'</div></div>';
+  }).join('');
+  $('#refCount').textContent = shown+' of '+total+' pre-reads';
+  $('#refList').innerHTML = html || '<div class="card empty">No references match.</div>';
 }
 function drawAnnex(){
   $('#annexBody').innerHTML = (REFS.annexures||[]).map(function(a){
@@ -288,10 +313,22 @@ function drawAnnex(){
       '</tbody></table></div>'+((a.more&&a.more.length)?'<div class="row" style="margin-top:10px">'+a.more.map(function(m){return extLink(m.url,m.label,'link');}).join('')+'</div>':'')+'</div>'; }).join('');
 }
 
+/* configuration versions */
+function versionsTable(){
+  var rows = [
+    ['Application', MF.app?('v'+MF.app.version):'', 'config/site.json'],
+    ['Questions', MF.questions?('v'+MF.questions.version+' · '+MF.questions.count+' items'):'', MF.questions?MF.questions.file:''],
+    ['Baseline', MF.baseline?(MF.baseline.name+' v'+MF.baseline.version+' · as of '+MF.baseline.asOf):'', MF.baseline?MF.baseline.file:'']
+  ];
+  (MF.references||[]).forEach(function(v){ rows.push(['References: '+v.id, 'v'+(v.version||'?')+(v.asOf?' · as of '+v.asOf:''), v.file]); });
+  rows.push(['Built', (MF.built||'')+' · fingerprint '+(MF.fingerprint||''), 'manifest.json']);
+  return '<table class="t"><thead><tr><th>Component</th><th>Version</th><th>Source</th></tr></thead><tbody>'+rows.map(function(r){ return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td><td><code>'+esc(r[2])+'</code></td></tr>'; }).join('')+'</tbody></table>';
+}
+
 /* license */
 function renderLicense(){
   var L = SITE.license||{};
-  $('#licLead').textContent = 'This project is released under the '+(L.name||'MIT')+' License. You may use, copy, modify and distribute it, provided the copyright notice and this permission notice are kept.';
+  $('#licLead').textContent = 'This project is released under the '+(L.name||'MIT')+' License. You may use, copy, modify and distribute it, provided this permission notice is kept.';
   $('#licText').textContent = C.licenseText || '';
 }
 
@@ -303,7 +340,8 @@ function renderAbout(){
   if(A.github) social.push('<a href="'+esc(safeUrl(A.github))+'" target="_blank" rel="noopener noreferrer">'+ICON.code+'GitHub</a>');
   var placeholder = isPlaceholder(A.linkedin)||isPlaceholder(A.github);
   $('#aboutBody').innerHTML = '<h1>About</h1><div class="card profile"><div class="avatar" aria-hidden="true">'+esc(initials)+'</div><div><div class="tiny" style="text-transform:uppercase;letter-spacing:.08em;font-weight:700">Created by</div><h2>'+esc(A.name||'')+'</h2><div class="muted">'+esc(A.role||'')+'</div>'+(A.bio?'<p class="small" style="margin:8px 0 0">'+esc(A.bio)+'</p>':'')+'<div class="social">'+social.join('')+'</div>'+(placeholder?'<div class="tiny" style="margin-top:8px">Profile links are placeholders: set <code>author.linkedin</code> and <code>author.github</code> in <code>config/site.json</code>.</div>':'')+'</div></div>'+
-    '<div class="card pad" style="margin-top:16px"><h2>This project</h2><dl class="kv"><dt>Name</dt><dd>'+esc(SITE.title||'')+'</dd><dt>Version</dt><dd>'+esc(SITE.version||'')+'</dd><dt>Built</dt><dd>'+esc(C.built||'')+'</dd><dt>Baseline</dt><dd>'+esc(BL.name)+' · as of '+esc(BL.asOf||'')+' · '+esc(BL.status||'')+'</dd><dt>Other baselines</dt><dd>'+esc((C.baselines||[]).filter(function(b){return b.id!==BL.id;}).map(function(b){return b.name;}).join(', ')||'none')+'</dd><dt>License</dt><dd><a href="#" data-go="license">'+esc((SITE.license||{}).name||'MIT')+'</a></dd>'+(isPlaceholder(SITE.repository)?'':'<dt>Source</dt><dd>'+extLink(SITE.repository,'Repository','repo')+'</dd>')+'<dt>Context</dt><dd>Prepared for the session "Preparing a country for AI scale", drawing on India’s digital transformation journey.</dd></dl></div>';
+    '<div class="card pad" style="margin-top:16px"><h2>This project</h2><dl class="kv"><dt>Name</dt><dd>'+esc(SITE.title||'')+'</dd><dt>Version</dt><dd>'+esc(SITE.version||'')+'</dd><dt>Built</dt><dd>'+esc(C.built||'')+'</dd><dt>Baseline</dt><dd>'+esc(BL.name)+' · as of '+esc(BL.asOf||'')+' · '+esc(BL.status||'')+'</dd><dt>Other baselines</dt><dd>'+esc((C.baselines||[]).filter(function(b){return b.id!==BL.id;}).map(function(b){return b.name;}).join(', ')||'none')+'</dd><dt>License</dt><dd><a href="#" data-go="license">'+esc((SITE.license||{}).name||'MIT')+'</a></dd>'+(isPlaceholder(SITE.repository)?'':'<dt>Source</dt><dd>'+extLink(SITE.repository,'Repository','repo')+'</dd>')+'<dt>Context</dt><dd>Prepared for the session "Preparing a country for AI scale", drawing on India’s digital transformation journey.</dd></dl></div>'+
+    '<div class="card pad" style="margin-top:16px"><h2>Configuration versions</h2><p class="small muted" style="margin-top:0">Each build records the version of every configuration file it used. The same details are saved in your exports and in <code>manifest.json</code> next to the built page.</p>'+versionsTable()+'</div>';
 }
 
 /* reset */

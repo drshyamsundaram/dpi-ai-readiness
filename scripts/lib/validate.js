@@ -2,7 +2,6 @@
 /** Structural checks for site, questions and references. Throws ConfigError; pushes soft issues to warn(). */
 const { ConfigError } = require('./config');
 
-const isUrl = (u) => /^https?:\/\//.test(u || '');
 
 function validateSite(site, warn) {
   if (!site.title) throw new ConfigError('site.json: "title" is required');
@@ -28,15 +27,6 @@ function validatePillars(pillars) {
   return ids;
 }
 
-function validateReferences(references, pillarIds, warn) {
-  (references.preReads || []).forEach((r, i) => {
-    if (!r.title) throw new ConfigError(`references.json preReads[${i}]: "title" is required`);
-    (r.links || []).forEach((l) => { if (!isUrl(l.url)) throw new ConfigError(`references.json preReads[${i}]: bad url "${l.url}"`); });
-    (r.pillars || []).forEach((p) => { if (p !== 'All' && !pillarIds.has(p)) warn(`pre-read ${r.n}: unknown pillar "${p}"`); });
-  });
-  (references.annexures || []).forEach((a) => (a.items || []).forEach((it) => {
-    if (!isUrl(it.url)) throw new ConfigError(`annexure ${a.id}: bad url "${it.url}"`);
-  }));
-}
+// Reference sets are validated in lib/references.js.
 
-module.exports = { validateSite, validatePillars, validateReferences };
+module.exports = { validateSite, validatePillars };

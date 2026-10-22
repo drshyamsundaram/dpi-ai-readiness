@@ -233,3 +233,6 @@ nav.tabs{min-width:0;flex:0 1 auto;margin-left:auto}
 }
 .assess>*{min-width:0}
 table.t td.num{white-space:nowrap}
+.refsec{margin:22px 0 6px}
+.refsec-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.refsec-h h2{margin:0}

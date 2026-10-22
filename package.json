@@ -1,6 +1,6 @@
 {
   "name": "ai-readiness-assessment",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "A config-driven, single-file HTML self-assessment of national AI readiness, benchmarked on India's DPI journey.",
   "author": "Dr Shyam Sundaram",
   "license": "MIT",

@@ -22,10 +22,11 @@ function deepCountry(obj, b) {
   return obj;
 }
 
-function renderPage({ site, pillars, baseline, references, licenseText, built, baselines }) {
+function renderPage({ site, pillars, baseline, references, licenseText, built, baselines, manifest, questions }) {
   const s = deepCountry(site, baseline);
-  s.storageKey = `${site.storageKey || 'ai-readiness-assessment-v1'}-${baseline.id}`;
-  const config = { site: s, pillars, baseline, baselines, references, licenseText, built };
+  // Answers are kept per country and per question version, so new questions never inherit old answers.
+  s.storageKey = `${site.storageKey || 'ai-readiness-assessment-v1'}-${baseline.id}-q${(questions && questions.version) || '0'}`;
+  const config = { site: s, pillars, baseline, baselines, references, licenseText, built, manifest };
   const replacements = {
     TITLE: escAttr(`${s.title} · ${baseline.short} baseline`),
     DESCRIPTION: escAttr(s.description),
@@ -52,6 +53,7 @@ function renderLanding({ site, entries, built }) {
         <div class="val">${e.overall.toFixed(1)}<span class="small muted"> / 5</span></div>
         <p class="small muted">${escHtml(e.summary)}</p>
         <p class="tiny">${escHtml(e.status)} · as of ${escHtml(e.asOf)}</p>
+        <p class="tiny">Baseline v${escHtml(e.version)} · ${e.refCount} references (${e.manifest.references.map((v) => `${escHtml(v.id)} v${escHtml(v.version)}`).join(', ')}) · questions v${escHtml(e.manifest.questions.version)} · <code>${escHtml(e.manifest.fingerprint)}</code></p>
       </a>`).join('');
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
