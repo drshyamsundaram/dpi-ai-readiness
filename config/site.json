@@ -1,0 +1,47 @@
+{
+  "title": "National AI-Readiness Assessment",
+  "subtitle": "Preparing a country for AI scale · {{COUNTRY}} baseline",
+  "description": "A 40-item, eight-pillar self-assessment of national AI readiness, benchmarked against a {{COUNTRY}} reference baseline.",
+  "version": "1.1.1",
+  "defaultCountry": "india",
+  "storageKey": "ai-readiness-assessment-v1",
+  "author": {
+    "name": "Dr Shyam Sundaram",
+    "role": "Fellow & Lead Technical Architect, iSPIRT DEPA Team",
+    "bio": "Works on consent-based data sharing, confidential computing and AI infrastructure as digital public infrastructure.",
+    "linkedin": "https://www.linkedin.com/in/REPLACE-WITH-YOUR-PROFILE",
+    "github": "https://github.com/REPLACE-WITH-YOUR-USERNAME"
+  },
+  "repository": "https://github.com/REPLACE-WITH-YOUR-USERNAME/ai-readiness-assessment",
+  "license": {
+    "name": "MIT",
+    "year": "2026",
+    "holder": "Dr Shyam Sundaram"
+  },
+  "bands": [
+    {
+      "min": 0,
+      "max": 2,
+      "name": "Foundational",
+      "text": "Core rails are missing; build DPI before AI at scale."
+    },
+    {
+      "min": 2,
+      "max": 3,
+      "name": "Emerging",
+      "text": "Rails exist in parts; AI is limited to pilots."
+    },
+    {
+      "min": 3,
+      "max": 4,
+      "name": "Scaling",
+      "text": "Rails at scale; AI is held back by one or two pillars."
+    },
+    {
+      "min": 4,
+      "max": 5.01,
+      "name": "AI-ready",
+      "text": "AI can be deployed at population scale on trusted rails."
+    }
+  ]
+}

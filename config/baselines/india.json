@@ -1,0 +1,66 @@
+{
+  "id": "india",
+  "aliases": ["bharat", "in"],
+  "name": "India",
+  "inSentence": "India",
+  "possessive": "India's",
+  "asOf": "October 2026",
+  "status": "Author's evidence-based assessment",
+  "summary": "Strongest on DPI rails and public-private institutions; weakest on compute and measured impact.",
+  "method": "Scored against the same anchors respondents use, from the public material in the pre-reads. Score what operates at national scale today; score the national picture; where a law exists but its obligations are not yet in force, score at most 3.",
+  "defaultSpread": 0.4,
+  "pillars": {
+    "P1": {
+      "items": [5, 5, 5, 4, 4],
+      "confidence": "High",
+      "evidence": "Aadhaar covers over 1.3 billion people; UPI handles billions of payments a month; DigiLocker and ONDC are live on open APIs",
+      "assumption": "Rails are already usable as AI distribution channels",
+      "lo": 4.3,
+      "hi": 4.8
+    },
+    "P2": {
+      "items": [4, 3, 3, 3, 4],
+      "confidence": "Medium",
+      "evidence": "Account Aggregators live in finance; ABDM in health; AIKosh datasets published; DEPA training and clean rooms at an early stage",
+      "assumption": "Data for training is available but uneven across sectors"
+    },
+    "P3": {
+      "items": [5, 5, 3, 3, 4],
+      "confidence": "Medium",
+      "evidence": "Aadhaar eKYC at scale; Account Aggregator consent live; DPDP Rules notified Nov 2025, with consent-manager and fiduciary obligations phasing in through 2026–27",
+      "assumption": "Consent for AI training and AI agents is not yet operational"
+    },
+    "P4": {
+      "items": [4, 3, 2, 3, 2],
+      "confidence": "Medium",
+      "evidence": "IndiaAI Compute Portal with tens of thousands of subsidised GPUs; Indic foundation models funded; data-centre, energy and chip supply still constrained",
+      "assumption": "Compute access is improving but small next to demand"
+    },
+    "P5": {
+      "items": [3, 5, 2, 4, 3],
+      "confidence": "Medium",
+      "evidence": "Very large engineering workforce and high AI-skills penetration; thinner frontier research and PhD depth; limited AI capacity among officials",
+      "assumption": "Breadth is strong, depth is the gap"
+    },
+    "P6": {
+      "items": [4, 4, 2, 3, 3],
+      "confidence": "Medium",
+      "evidence": "AI Governance Guidelines (Nov 2025); IndiaAI Safety Institute; sector guidance from RBI and ICMR; IT Rules on synthetic content; no horizontal AI law",
+      "assumption": "Principles-based approach is deliberate, but enforcement and testing capacity are still forming"
+    },
+    "P7": {
+      "items": [5, 5, 3, 4, 4],
+      "confidence": "High",
+      "evidence": "NPCI and Sahamati as neutral Section 8 operators; iSPIRT and volunteer-tech model; IndiaAI compute delivered through private providers",
+      "assumption": "The model carries over from payments and data to AI",
+      "lo": 3.8,
+      "hi": 4.5
+    },
+    "P8": {
+      "items": [4, 2, 3, 2, 4],
+      "confidence": "Low",
+      "evidence": "Bhashini for Indian languages and voice; strong DPI inclusion record; few published outcome metrics for AI deployments",
+      "assumption": "Inclusion strength from DPI has not yet been shown for AI"
+    }
+  }
+}
