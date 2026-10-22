@@ -9,14 +9,14 @@
     "name": "Dr Shyam Sundaram",
     "role": "Fellow & Lead Technical Architect, iSPIRT DEPA Team",
     "bio": "Works on consent-based data sharing, confidential computing and AI infrastructure as digital public infrastructure.",
-    "linkedin": "https://www.linkedin.com/in/REPLACE-WITH-YOUR-PROFILE",
-    "github": "https://github.com/REPLACE-WITH-YOUR-USERNAME"
+    "linkedin": "https://www.linkedin.com/in/bioenable",
+    "github": "https://github.com/drshyamsundaram"
   },
-  "repository": "https://github.com/REPLACE-WITH-YOUR-USERNAME/ai-readiness-assessment",
+  "repository": "https://github.com/drshyamsundaram/dpi-ai-readiness",
   "license": {
     "name": "MIT",
     "year": "2026",
-    "holder": "Dr Shyam Sundaram"
+    "holder": ""
   },
   "bands": [
     {
