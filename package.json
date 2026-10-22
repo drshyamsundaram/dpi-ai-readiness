@@ -1,0 +1,30 @@
+{
+  "name": "ai-readiness-assessment",
+  "version": "1.1.1",
+  "description": "A config-driven, single-file HTML self-assessment of national AI readiness, benchmarked on India's DPI journey.",
+  "author": "Dr Shyam Sundaram",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.js",
+    "build:india": "node scripts/build.js --country india",
+    "build:us": "node scripts/build.js --country us",
+    "build:china": "node scripts/build.js --country china",
+    "build:all": "node scripts/build.js --all",
+    "check": "node scripts/build.js --check --all",
+    "list": "node scripts/build.js --list",
+    "watch": "node scripts/watch.js",
+    "serve": "npx --yes http-server dist -p 8080 -c-1"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "keywords": [
+    "digital-public-infrastructure",
+    "dpi",
+    "depa",
+    "ai-readiness",
+    "india-stack",
+    "assessment"
+  ]
+}
