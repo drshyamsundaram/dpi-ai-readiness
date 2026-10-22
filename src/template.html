@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<meta name="author" content="{{AUTHOR}}">
+<meta name="generator" content="ai-readiness-assessment {{VERSION}} (built {{BUILT}})">
+<style>
+{{STYLES}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><b id="brandTitle"></b><span id="brandSub"></span></div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" data-view="intro" aria-selected="true">Start</button>
+      <button role="tab" data-view="assess" aria-selected="false">Assess</button>
+      <button role="tab" data-view="results" aria-selected="false">Results</button>
+      <button role="tab" data-view="group" aria-selected="false">Group</button>
+      <span class="navsep" aria-hidden="true"></span>
+      <button role="tab" data-view="readme" aria-selected="false">ReadMe</button>
+      <button role="tab" data-view="instructions" aria-selected="false">Instructions</button>
+      <button role="tab" data-view="references" aria-selected="false">References</button>
+      <button role="tab" data-view="license" aria-selected="false">License</button>
+      <button role="tab" data-view="about" aria-selected="false">About</button>
+    </nav>
+    <button class="iconbtn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">◐</button>
+  </div>
+  <div class="progress"><i id="prog"></i></div>
+</header>
+
+<main class="wrap">
+  <section class="view active" id="view-intro">
+    <h1>How ready is your country to run AI at national scale?</h1>
+    <p class="lead">40 questions across eight pillars, each answered against written anchors, then compared with a {{COUNTRY}} reference baseline. It takes about 25 minutes. Your answers stay in this browser unless you export them.</p>
+    <div class="steps" style="margin-bottom:24px">
+      <div class="step"><h3>Profile</h3><div class="small muted">Say who you are and which country you're assessing.</div></div>
+      <div class="step"><h3>Assess</h3><div class="small muted">Choose the anchor that matches the evidence, and note the evidence.</div></div>
+      <div class="step"><h3>Compare</h3><div class="small muted">See your pillar scores, your gaps to {{COUNTRY_SHORT}} and your binding constraint.</div></div>
+      <div class="step"><h3>Pool</h3><div class="small muted">Load several exported responses to see the group median and spread.</div></div>
+    </div>
+    <div class="grid g2">
+      <div class="card pad">
+        <h2>Respondent profile</h2>
+        <p class="small muted" style="margin-top:0">Used to label your exports and group results.</p>
+        <div class="grid g2" style="gap:12px">
+          <label class="f">Name<input id="pf-name" autocomplete="name"></label>
+          <label class="f">Organisation<input id="pf-org" autocomplete="organization"></label>
+          <label class="f">Country being assessed<input id="pf-country" placeholder="e.g. India"></label>
+          <label class="f">Role<select id="pf-role"><option value="">Select…</option><option>Government</option><option>Regulator</option><option>Industry</option><option>Academia</option><option>Civil society</option><option>Multilateral</option></select></label>
+          <label class="f">Main pillar of expertise<select id="pf-pillar"><option value="">Select…</option></select></label>
+          <label class="f">Familiarity with India's DPI<select id="pf-fam"><option value="">Select…</option><option>None</option><option>Some</option><option>Deep</option></select></label>
+        </div>
+        <div class="row" style="margin-top:18px">
+          <button class="btn primary" data-go="assess">Begin assessment →</button>
+          <button class="btn ghost danger" id="resetBtn">Reset my answers</button>
+        </div>
+        <div class="tiny" id="resumeNote" style="margin-top:8px"></div>
+      </div>
+      <div class="card pad">
+        <h2>How to answer</h2>
+        <ul class="small" style="padding-left:18px;margin:8px 0 14px">
+          <li><b>1, 3 and 5</b> have written anchors. Choose <b>2</b> or <b>4</b> when the truth lies between two anchors.</li>
+          <li>Score what <b>operates at national scale today</b>, not what has been announced or piloted.</li>
+          <li>Choose <b>DK</b> if you don't know. It isn't scored, but two or more DKs in a pillar mark it as having insufficient evidence.</li>
+          <li>Add <b>one fact or source</b> for each answer. Scores without evidence are counted, but flagged.</li>
+          <li>The {{COUNTRY}} baseline is <b>hidden while you answer</b>, so it doesn't anchor your scores. You can switch it on in the sidebar.</li>
+        </ul>
+        <div class="small muted">Full guidance is in <a href="#" data-go="instructions">Instructions</a>; the method is in <a href="#" data-go="readme">ReadMe</a>.</div>
+      </div>
+    </div>
+    <h2 style="margin-top:30px">The eight pillars</h2>
+    <p class="small muted" style="margin-top:0">P1–P3 are the rails India built for DPI. P4–P6 are what AI adds on top. P7–P8 decide whether the system is trusted and used.</p>
+    <div class="pillars-list" id="pillarsList"></div>
+  </section>
+
+  <section class="view" id="view-assess">
+    <div class="assess">
+      <aside class="side">
+        <div class="card" id="sideNav"></div>
+        <label class="toggle noprint"><input type="checkbox" id="showBase"> Show {{COUNTRY_SHORT}} baseline</label>
+      </aside>
+      <div id="pillarPane"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-results">
+    <div class="phead">
+      <div><h1 style="margin:0" id="resTitle">Your readiness profile</h1><div class="muted small" id="resMeta"></div></div>
+      <div class="row noprint">
+        <button class="btn" id="exJson">Export response (JSON)</button>
+        <button class="btn" id="exCsv">Export CSV</button>
+        <button class="btn" onclick="window.print()">Print / PDF</button>
+      </div>
+    </div>
+    <div id="resBody"></div>
+  </section>
+
+  <section class="view" id="view-group">
+    <h1>Group results</h1>
+    <p class="lead">Load the JSON exports from several respondents to see the median score, the spread and the gap to the {{COUNTRY}} baseline for each pillar. Everything is computed in this browser; no files are uploaded anywhere.</p>
+    <div class="drop noprint" id="drop" tabindex="0">
+      <b>Drop response files here</b> or click to choose them<br><span class="tiny">.json files exported from the Results tab</span>
+      <input type="file" id="fileIn" accept=".json,application/json" multiple hidden>
+    </div>
+    <div class="row noprint" style="margin-top:12px">
+      <button class="btn" id="addMine">Add my current response</button>
+      <button class="btn ghost danger" id="clearGroup">Clear group</button>
+      <button class="btn" id="exGroup">Export group CSV</button>
+    </div>
+    <div id="groupBody" style="margin-top:20px"></div>
+  </section>
+
+  <section class="view" id="view-readme"><article class="prose">{{README}}</article></section>
+  <section class="view" id="view-instructions"><article class="prose">{{INSTRUCTIONS}}</article></section>
+  <section class="view" id="view-references"><div id="refBody"></div></section>
+  <section class="view" id="view-license">
+    <h1>License</h1>
+    <p class="lead" id="licLead"></p>
+    <pre class="lic" id="licText"></pre>
+  </section>
+  <section class="view" id="view-about"><div class="about" id="aboutBody"></div></section>
+</main>
+
+<footer><div class="wrap" id="footText"></div></footer>
+<div class="toast" id="toast"></div>
+
+<script>
+window.APP_CONFIG = {{CONFIG}};
+</script>
+<script>
+{{SCRIPT}}
+</script>
+</body>
+</html>
